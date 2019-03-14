@@ -15,7 +15,7 @@ bool rayIntersectsTriangle(Ray ray, Triangle triangle, V3f* outIntersectionPoint
     edge1 = V3fSub(vertex1, vertex0);
     edge2 = V3fSub(vertex2, vertex0);
 
-    h = V3fCrossProd(V3fSub(ray.direction, ray.origin),edge2);
+    h = V3fCrossProd(ray.direction,edge2);
     a = V3fDotProd(edge1, h);
 
     if (a > -EPSILON && a < EPSILON)
@@ -27,14 +27,14 @@ bool rayIntersectsTriangle(Ray ray, Triangle triangle, V3f* outIntersectionPoint
     if (u < 0.0 || u > 1.0)
         return false;
     q = V3fCrossProd(s,edge1);
-    v = f * V3fDotProd(V3fSub(ray.direction, ray.origin),q);
+    v = f * V3fDotProd(ray.direction,q);
     if (v < 0.0 || u + v > 1.0)
         return false;
     // At this stage we can compute t to find out where the intersection point is on the line.
     float t = f * V3fDotProd(edge2,q);
     if (t > EPSILON) // ray intersection
     {
-        *outIntersectionPoint = V3fSum(ray.origin, V3fMul(V3fSub(ray.direction, ray.origin), (V3f){t,t,t}));
+        *outIntersectionPoint = V3fAdd(ray.origin, V3fMul(ray.direction, (V3f){t,t,t}));
         return true;
     }
     else // This means that there is a line intersection but not a ray intersection.
