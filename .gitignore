@@ -1,0 +1,19 @@
+#Valgrind
+vgcore.*
+
+#Stl files
+*.stl
+
+#Image files
+*.png
+*.ppm
+
+#Bin
+bin/*
+
+# Ignore the build and lib dirs
+build
+dep/*
+
+# vscode
+.vscode
