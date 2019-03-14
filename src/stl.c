@@ -16,7 +16,7 @@ STLFile loadSTL(const char* filename){
     fread(&stl.numTriangles, sizeof(stl.numTriangles), 1, fd);
     stl.numTriangles = le32toh(stl.numTriangles);
 
-    assert(stl.numTriangles<100000); // possibly ascii stl.
+    assert(stl.numTriangles<50000); // possibly ascii stl.
 
     stl.triangle = malloc(sizeof(Triangle) * stl.numTriangles);
     for (int triangleId = 0; triangleId < stl.numTriangles; triangleId++){

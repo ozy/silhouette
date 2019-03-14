@@ -9,6 +9,12 @@ typedef struct Ray{
     V3f direction;
 }Ray;
 
-bool rayIntersectsTriangle(Ray ray, Triangle obj, V3f* outIntersectionPoint);
-bool rayIntersectsObject(Ray ray, Object obj, V3f* outIntersectionPoint);
+typedef struct Hit{
+    V3f hitIntersectionPoint;
+    V3f hitNormal;
+}Hit;
+
+
+bool rayIntersectsTriangle(Ray ray, Triangle obj, Hit* hit);
+bool rayIntersectsObject(Ray ray, Object obj, Hit* hit);
 #endif

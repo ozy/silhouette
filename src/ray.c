@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-bool rayIntersectsTriangle(Ray ray, Triangle triangle, V3f* outIntersectionPoint){
+bool rayIntersectsTriangle(Ray ray, Triangle triangle, Hit* hit){
     const float EPSILON = 0.0000001;
 
     V3f vertex0 = triangle.points[0];
@@ -34,7 +34,7 @@ bool rayIntersectsTriangle(Ray ray, Triangle triangle, V3f* outIntersectionPoint
     float t = f * V3fDotProd(edge2,q);
     if (t > EPSILON) // ray intersection
     {
-        *outIntersectionPoint = V3fAdd(ray.origin, V3fMul(ray.direction, (V3f){t,t,t}));
+        hit->hitIntersectionPoint = V3fAdd(ray.origin, V3fMul(ray.direction, (V3f){t,t,t}));
         return true;
     }
     else // This means that there is a line intersection but not a ray intersection.
@@ -42,19 +42,20 @@ bool rayIntersectsTriangle(Ray ray, Triangle triangle, V3f* outIntersectionPoint
 
 }
 
-bool rayIntersectsObject(Ray ray, Object obj, V3f* outIntersectionPoint){
+bool rayIntersectsObject(Ray ray, Object obj, Hit* hit){
     V3f NearestOutIntersectionPoint = {+INFINITY, +INFINITY, +INFINITY};
 
     for (int TriangleId = 0; TriangleId < obj.STL->numTriangles; TriangleId++){
         Triangle tr = obj.STL->triangle[TriangleId];
-        if (rayIntersectsTriangle(ray, tr, outIntersectionPoint)){
-            if (V3fLen(V3fSub(*outIntersectionPoint,ray.origin)) < V3fLen(V3fSub(NearestOutIntersectionPoint, ray.origin))){
-                NearestOutIntersectionPoint = *outIntersectionPoint;
+        if (rayIntersectsTriangle(ray, tr, hit)){
+            if (V3fLen(V3fSub(hit->hitIntersectionPoint,ray.origin)) < V3fLen(V3fSub(NearestOutIntersectionPoint, ray.origin))){
+                NearestOutIntersectionPoint = hit->hitIntersectionPoint;
+                hit->hitNormal = tr.normal;
             }
         }
     }
     if (NearestOutIntersectionPoint.x != +INFINITY){
-        *outIntersectionPoint = NearestOutIntersectionPoint;
+        hit->hitIntersectionPoint = NearestOutIntersectionPoint;
         return true;
     }
     return false;

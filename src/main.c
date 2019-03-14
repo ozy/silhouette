@@ -23,11 +23,33 @@ void depthShader (int px, int py, V3f rayDir, Job* job){
     camRay.direction = rayDir;
     // this shader is for debugging
     uint8_t (*framebuf)[job->frameh][job->framew][3] = (uint8_t (*)[job->frameh][job->framew][3])job->frameBuf;
-    V3f outIntersectionPoint;
-    if (rayIntersectsObject(camRay, *job->obj, &outIntersectionPoint)){
-        (*framebuf)[py][px][0] = outIntersectionPoint.z*5;
-        (*framebuf)[py][px][1] = outIntersectionPoint.z*5;
-        (*framebuf)[py][px][2] = outIntersectionPoint.z*5;
+    Hit hit;
+    if (rayIntersectsObject(camRay, *job->obj, &hit)){
+        (*framebuf)[py][px][0] = hit.hitIntersectionPoint.z*5;
+        (*framebuf)[py][px][1] = hit.hitIntersectionPoint.z*5;
+        (*framebuf)[py][px][2] = hit.hitIntersectionPoint.z*5;
+    }
+    else
+        (*framebuf)[py][px][0] = 0;
+}
+
+void facingRatioShader (int px, int py, V3f rayDir, Job* job){ 
+    // this shader relies on stl normals (not calculated by this program)
+    // If you're having problems with this shader, this might be related with that.
+    Ray camRay;
+    camRay.origin = (V3f){job->camMatrix.matrix[3][0], job->camMatrix.matrix[3][1], job->camMatrix.matrix[3][2]};
+    camRay.direction = rayDir;
+    uint8_t (*framebuf)[job->frameh][job->framew][3] = (uint8_t (*)[job->frameh][job->framew][3])job->frameBuf;
+    Hit hit;
+    if (rayIntersectsObject(camRay, *job->obj, &hit)){
+        V3f col = V3fCrossProd(hit.hitNormal, V3fMul(rayDir, (V3f){-1,-1,-1}));
+        col = V3fMul ((V3f){255,255,255}, col);
+        float shade = V3fLen(col);
+        // Use col x,y,z for r,g,b respectively to render colorfully
+        // or the vector length for all to shade grayscale
+        (*framebuf)[py][px][0] = shade;
+        (*framebuf)[py][px][1] = shade;
+        (*framebuf)[py][px][2] = shade;
     }
     else
         (*framebuf)[py][px][0] = 0;
@@ -53,7 +75,7 @@ void* render (void* jobPtr){
 
             V3f dir = V3fAdd(V3fAdd( w, V3fMul(xp,u)), V3fMul(yp,v)); // calc camera direction vector.
             dir = V3fNormalize(dir);
-            depthShader(x, y, dir, job);
+            facingRatioShader(x, y, dir, job);
         }
     }
     free(job);
@@ -62,14 +84,14 @@ void* render (void* jobPtr){
 
 int main(int argc, char* argv[]){
     int numThreads = get_nprocs();
-    int framew = 1920, frameh = 1024;
+    int framew = 1024, frameh = 1024;
     pthread_t inc_x_thread[numThreads];
 
     STLFile stl = loadSTL(argv[1]);
     Object obj;
 
     Matrix44f camMatrix;
-    camMatrix = lookAt((V3f){100,100,120},(V3f){0,0,0});
+    camMatrix = lookAt((V3f){100,100,150},(V3f){0,0,0});
     //                     ^ Camera Origin,    ^ Target
     obj.Pos = (V3f){0,0,0};
     obj.STL = &stl;
