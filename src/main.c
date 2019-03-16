@@ -29,8 +29,11 @@ void depthShader (int px, int py, V3f rayDir, Job* job){
         (*framebuf)[py][px][1] = hit.hitIntersectionPoint.z*5;
         (*framebuf)[py][px][2] = hit.hitIntersectionPoint.z*5;
     }
-    else
+    else{
         (*framebuf)[py][px][0] = 0;
+        (*framebuf)[py][px][1] = 0;
+        (*framebuf)[py][px][2] = 0;
+    }
 }
 
 void facingRatioShader (int px, int py, V3f rayDir, Job* job){ 
@@ -51,8 +54,11 @@ void facingRatioShader (int px, int py, V3f rayDir, Job* job){
         (*framebuf)[py][px][1] = shade;
         (*framebuf)[py][px][2] = shade;
     }
-    else
+    else{
         (*framebuf)[py][px][0] = 0;
+        (*framebuf)[py][px][1] = 0;
+        (*framebuf)[py][px][2] = 0;
+    }
 }
 
 void* render (void* jobPtr){
