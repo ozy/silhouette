@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stl.h"
-#include <endian.h>
 #include "ray.h"
 #include <pthread.h>
 #include <sys/sysinfo.h>
@@ -25,9 +24,10 @@ void depthShader (int px, int py, V3f rayDir, Job* job){
     uint8_t (*framebuf)[job->frameh][job->framew][3] = (uint8_t (*)[job->frameh][job->framew][3])job->frameBuf;
     Hit hit;
     if (rayIntersectsObject(camRay, *job->obj, &hit)){
-        (*framebuf)[py][px][0] = hit.hitIntersectionPoint.z*5;
-        (*framebuf)[py][px][1] = hit.hitIntersectionPoint.z*5;
-        (*framebuf)[py][px][2] = hit.hitIntersectionPoint.z*5;
+        float shade = V3fLen(V3fSub(hit.hitIntersectionPoint,camRay.origin));
+        (*framebuf)[py][px][0] = shade*5;
+        (*framebuf)[py][px][1] = shade*5;
+        (*framebuf)[py][px][2] = shade*5;
     }
     else{
         (*framebuf)[py][px][0] = 0;
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]){
 
         }
     }
-
+    
     // write into file
     printf("P3\n%d %d\n255\n",framew, frameh);
 
