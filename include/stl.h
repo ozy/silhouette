@@ -6,6 +6,7 @@
 typedef struct Triangle{
     V3f normal;
     V3f points[3];
+    uint16_t attrByteCount;
 }Triangle;
 
 typedef struct STLFile{
