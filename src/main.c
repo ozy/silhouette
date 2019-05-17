@@ -122,7 +122,7 @@ int main(int argc, char* argv[]){
         }
     }
 
-    for (int i=0; i<8; i++){
+    for (int i=0; i<numThreads; i++){
         if(pthread_join(inc_x_thread[i], NULL)) {
 
             fprintf(stderr, "Error joining thread\n");
