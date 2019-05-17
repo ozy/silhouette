@@ -45,11 +45,8 @@ void facingRatioShader (int px, int py, V3f rayDir, Job* job){
     uint8_t (*framebuf)[job->frameh][job->framew][3] = (uint8_t (*)[job->frameh][job->framew][3])job->frameBuf;
     Hit hit;
     if (rayIntersectsObject(camRay, *job->obj, &hit)){
-        V3f col = V3fCrossProd(hit.hitNormal, V3fMul(rayDir, (V3f){-1,-1,-1}));
-        col = V3fMul ((V3f){255,255,255}, col);
-        float shade = V3fLen(col);
-        // Use col x,y,z for r,g,b respectively to render colorfully
-        // or the vector length for all to shade grayscale
+        float shade = V3fDotProd(hit.hitNormal, V3fMul(rayDir, (V3f){-1,-1,-1})) * 255.0 ;
+        shade = fmax(0.0,shade);
         (*framebuf)[py][px][0] = shade;
         (*framebuf)[py][px][1] = shade;
         (*framebuf)[py][px][2] = shade;
